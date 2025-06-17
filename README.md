@@ -16,7 +16,7 @@ StackCore is a lightweight Python package for mechanical **tolerance stack‑up 
 
 - 🧮 **Tolerance stack‑up under control**: manage multi‑component linear and geometric assemblies.
 - 🔁 **Monte Carlo engine**: generate distributions, confidence ranges, and worst‑case scenarios.
-- 🧠 **Subtle intelligence**: leverage surrogate modelling for quick inference responses at comparable convergence.
+- 🧠 **Subtle intelligence** (coming soon!): leverage surrogate modelling for quick inference responses at comparable convergence.
 - 📊 **Flexible output**: summary stats, histograms, and data visualization tools.
 - 🔌 **Clean APIs**: `Stack`, `Component`, `Tolerance`, `Simulator`.
 - 🛠️ **Designed for engineers**: zone‑independent, boundary‑aware, CAD/tool‑agnostic.

@@ -20,8 +20,6 @@ def get_plane_equation(p):
     # This evaluates a * x3 + b * y3 + c * z3 which equals d
     d = np.dot(cp, p2)
 
-    print('The equation is {0}x + {1}y + {2}z = {3}'.format(a, b, c, d))
-
     return a, b, c, d
 
 
@@ -49,8 +47,8 @@ def get_changeofbasis(p):
 
 
 def plot_3d(points):
-#Plots a 3d plane given 3 points to define the plane
-
+    #Plots a 3d plane given 3 points to define the plane
+    
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
     i=0
