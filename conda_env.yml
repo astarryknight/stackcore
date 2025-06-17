@@ -1,0 +1,23 @@
+# make env: `conda env create -f conda_env.yml`
+
+name: stCore
+#tolsu - tolerance stack up
+
+channels:
+  - defaults
+  - conda-forge
+
+dependencies:
+  - python=3.9
+  - pip
+  - numpy
+  - matplotlib
+  - scipy
+  - tqdm
+  - ipympl=0.9.5
+  - ipykernel
+  - jupyter
+  - notebook
+  - numba
+
+  - pip:
