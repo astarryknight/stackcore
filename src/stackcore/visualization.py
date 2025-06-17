@@ -1,9 +1,13 @@
 import matplotlib.pyplot as plt
 import numpy as np
+import numpy.typing as npt
 import math
 
-def get_plane_equation(p):
-    #input plane, return coefficients for plane equation in the form ax+by+cz=d
+def get_plane_equation(p: npt.NDArray) -> float:
+    """
+    A computation that calculates the coefficients for the plane equation in the form ax+by+cz=d.
+
+    """
     p0, p1, p2 = p
     p0=np.asarray(p0)
     p1=np.asarray(p1)
@@ -23,7 +27,11 @@ def get_plane_equation(p):
     return a, b, c, d
 
 
-def get_changeofbasis(p):
+def get_changeofbasis(p: npt.NDArray) -> np.ndarray:
+    """
+    A computation that calculates the translation and rotation matrices for a change of basis.
+
+    """
     #input plane, return tranlsation and rotation matrices
     #https://math.stackexchange.com/questions/1167717/transform-a-plane-to-the-xy-plane
     a,b,c,d=get_plane_equation(p)
@@ -46,7 +54,11 @@ def get_changeofbasis(p):
     return t, R
 
 
-def plot_3d(points):
+def plot_3d(points: npt.NDArray):
+    """
+    Plots a 3D plane defined by 3 coordinates.
+
+    """
     #Plots a 3d plane given 3 points to define the plane
     
     fig = plt.figure()
@@ -85,7 +97,6 @@ def plot_3d(points):
         
         ax.plot_surface(X, Y, Z, alpha=0.75, color=col[i])
         ax.plot(*zip(p0, p1, p2), color=col[i], label=label, linestyle=' ', marker='o')
-        
         i+=1
         
     ax.view_init(0, 22)
