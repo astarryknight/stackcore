@@ -1,3 +1,4 @@
 pyproject.toml.bu
 archive/*
 *.ipynb
+__pycache__
