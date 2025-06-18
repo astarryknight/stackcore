@@ -1,3 +1,5 @@
+from stackcore import stack
+
 from stackcore.stack import Stack
 import numpy as np
 
