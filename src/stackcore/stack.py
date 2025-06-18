@@ -2,9 +2,11 @@ import numpy as np
 import numpy.typing as npt
 import matplotlib.pyplot as plt
 import scipy.stats as stats
-import matrix as matrix
+
+from . import matrix
+from . import point_manipulation as pm
+
 from tqdm import tqdm
-import point_manipulation as pm
 import timeit
 
 
