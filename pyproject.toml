@@ -1,3 +1,29 @@
 [build-system]
 requires = ["hatchling >= 1.26"]
 build-backend = "hatchling.build"
+
+[project]
+name = "stackcore"
+version = "0.1.2"
+authors = [
+  { name="Example Author", email="author@example.com" },
+]
+description = "A lightweight Python package for mechanical tolerance stack‑up analysis."
+dependencies = [
+    "numpy", 
+    "matplotlib", 
+    "tqdm", 
+    "scipy"
+]
+readme = "README.md"
+requires-python = ">=3.9"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
+license = "MIT"
+license-files = ["LICEN[CS]E*"]
+
+[project.urls]
+Homepage = "https://github.com/astarryknight/stackcore"
+Issues = "https://github.com/astarryknight/stackcore/issues"
