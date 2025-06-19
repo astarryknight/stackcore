@@ -1,4 +1,5 @@
 pyproject.toml.bu
-archive/*
+archive
 *.ipynb
 __pycache__
+.pytest_cache
