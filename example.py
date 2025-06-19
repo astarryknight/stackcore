@@ -1,6 +1,4 @@
-from stackcore import stack
-
-from stackcore.stack import Stack
+from stackcore import Stack
 import numpy as np
 
 m=np.array([[3,  2, -1],
