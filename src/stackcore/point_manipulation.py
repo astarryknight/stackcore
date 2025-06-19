@@ -8,7 +8,7 @@ def point_around_axis(point: npt.NDArray, direction: npt.NDArray, radius: float,
     """
     direction = direction/np.linalg.norm(direction)
 
-    arbitrary_vector = np.array([1, 0, 0]) if direction[0] != 1 else np.array([0, 1, 0])
+    arbitrary_vector = np.array([1, 0, 0]) if (direction[0] != 1).all() else np.array([0, 1, 0])
     v1 = np.cross(direction, arbitrary_vector)
     v1 = v1/np.linalg.norm(v1)
     v2 = np.cross(direction, v1)
