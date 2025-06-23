@@ -1,10 +1,12 @@
 # from stackcore import matrix
 # from stackcore import point_manipulation as pm
+import sys
+import os
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'src')))
+
 import stackcore.matrix as matrix
 import stackcore.point_manipulation as pm
 import numpy as np
-
-
 
 #Matrix Tests
 def test_norm():
