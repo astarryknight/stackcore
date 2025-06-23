@@ -16,7 +16,6 @@ metrics = [
     }
 ]
 
-# Mirror C5M1
 components = [
              {'plane': np.array([[-8, 1, 5],
                                  [-4, 7, 3],
