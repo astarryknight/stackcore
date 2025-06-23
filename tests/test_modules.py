@@ -52,9 +52,11 @@ class TestPM:
         ]
     
     def test_axis(self):
-        p, ax, tol, angle, rad, disp = self.a
-        assert(np.allclose(pm.point_around_axis(p, ax, tol, angle), rad))
+        for m in self.a:
+            p, ax, tol, angle, rad, disp = m
+            assert(np.allclose(pm.point_around_axis(p, ax, tol, angle), rad))
 
     def test_displacement(self):
-        p, ax, tol, angle, rad, disp = self.a
-        assert(np.allclose(pm.point_displacement(p, ax, tol), disp))
+        for m in self.a:
+            p, ax, tol, angle, rad, disp = m
+            assert(np.allclose(pm.point_displacement(p, ax, tol), disp))
