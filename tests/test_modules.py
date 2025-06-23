@@ -1,6 +1,10 @@
-from stackcore import matrix
-from stackcore import point_manipulation as pm
+# from stackcore import matrix
+# from stackcore import point_manipulation as pm
+import stackcore.matrix as matrix
+import stackcore.point_manipulation as pm
 import numpy as np
+
+
 
 #Matrix Tests
 def test_norm():
