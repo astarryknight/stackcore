@@ -3,6 +3,8 @@ import numpy.typing as npt
 import matplotlib.pyplot as plt
 import scipy.stats as stats
 
+from numba import njit, prange
+
 # from . import matrix
 # from . import point_manipulation as pm
 
@@ -12,15 +14,89 @@ import pm
 from tqdm import tqdm
 import timeit
 
+from ext import *
+    
+#@njit(parallel=True)
+def loop(ncases, mp_og, tolerance_types, tolerance_ranges, tolerance_axes, tolerance_counts, component_planes, metric_refs):
+
+    n_metrics = metric_refs.shape[0]
+    computed_metrics = np.zeros((n_metrics, ncases), dtype=np.float64)
+
+    #print(computed_metrics[0,0])
+
+    for i in range(ncases):
+        mp1 = mp_og[0].copy() #main_plane p1
+        mp2 = mp_og[1].copy() #main_plane p2
+        mp3 = mp_og[2].copy() #main_plane p3
+        
+        for j in range(len(component_planes)):
+            # Get the original point. The transformation matrix is applied first if it is not the first component
+            # if j == 0:
+            #     pog = component_planes[j]
+            # else:
+            #     pog = np.array([(T@np.append(pog[0,:],1))[0:3],
+            #                     (T@np.append(pog[1,:],1))[0:3],
+            #                     (T@np.append(pog[2,:],1))[0:3]])
+            # p1 = pog[0,:]; p2 = pog[1,:]; p3 = pog[2,:]
+            pog = component_planes[j].copy()
+            p1, p2, p3 = pog[0].copy(), pog[1].copy(), pog[2].copy() # may not work properly for more than one component... but we'll see 
+            
+            # Apply tolerances
+            for k in range(tolerance_counts[j]): 
+                if tolerance_types[j][k] == 0:
+                    p1 = point_around_axis_numba(p1, tolerance_axes[j][k][0,:], np.random.uniform(tolerance_ranges[j][k][0], tolerance_ranges[j][k][1]), np.random.uniform(0, 2*np.pi))
+                    p2 = point_around_axis_numba(p2, tolerance_axes[j][k][1,:], np.random.uniform(tolerance_ranges[j][k][0], tolerance_ranges[j][k][1]), np.random.uniform(0, 2*np.pi))
+                    p3 = point_around_axis_numba(p3, tolerance_axes[j][k][2,:], np.random.uniform(tolerance_ranges[j][k][0], tolerance_ranges[j][k][1]), np.random.uniform(0, 2*np.pi))
+                elif tolerance_types[j][k] == 1:
+                    p1 = point_displacement(p1, tolerance_axes[j][k][0,:], np.random.uniform(tolerance_ranges[j][k][0], tolerance_ranges[j][k][1]))
+                    p2 = point_displacement(p2, tolerance_axes[j][k][1,:], np.random.uniform(tolerance_ranges[j][k][0], tolerance_ranges[j][k][1]))
+                    p3 = point_displacement(p3, tolerance_axes[j][k][2,:], np.random.uniform(tolerance_ranges[j][k][0], tolerance_ranges[j][k][1]))
+                else:
+                    #raise Exception('Incompatible tolerance type')
+                    continue #raise makes a lot of problems in numba
+
+            # Get the transformation matrix (T) related to the applied tolerance
+            # p_new = np.array([p1, p2, p3])
+            #print(p1)
+            p_new = np.zeros((3, 3), dtype=np.float64)
+            p_new[0], p_new[1], p_new[2] = p1, p2, p3
+
+            #get_normal(pog[0], pog[1], pog[2])
+            get_transformation_matrix(pog, p_new)
+
+
+            T = get_transformation_matrix(pog, p_new)
+            #T = matrix.get_transformation_matrix(pog, p_new)
+
+            # Apply it to the mirror
+            # mp1 = (T@np.append(mp1,1))[0:3]
+            # mp2 = (T@np.append(mp2,1))[0:3]
+            # mp3 = (T@np.append(mp3,1))[0:3]
+            mp1_homogeneous = np.array([mp1[0], mp1[1], mp1[2], 1.0])
+            mp2_homogeneous = np.array([mp2[0], mp2[1], mp2[2], 1.0])
+            mp3_homogeneous = np.array([mp3[0], mp3[1], mp3[2], 1.0])
+            
+            mp1 = matrix_vector_multiply_3x4(T, mp1_homogeneous)
+            mp2 = matrix_vector_multiply_3x4(T, mp2_homogeneous)
+            mp3 = matrix_vector_multiply_3x4(T, mp3_homogeneous)
+
+        # Get the angles
+        norm_mp = get_normal_numba(mp1, mp2, mp3)
+        for k in range(len(metric_refs)):
+            computed_metrics[k][i] = np.arccos(metric_refs[k]@norm_mp)
+
+    return computed_metrics
+
+
 class Stack:
     '''
     Tolerance stack-up analysis tools.
 
     '''
-    def __init__(self, main_plane: npt.NDArray, ref_plane: npt.NDArray, components: dict, metrics: dict, path: str):
-        self.mp = np.asanyarray(main_plane)
+    def __init__(self, main_plane: npt.NDArray, ref_plane: npt.NDArray, components: dict, metrics: dict, path: str, save: bool):
+        self.mp = np.asanyarray(main_plane, dtype=np.float64)  # Ensure float64
         '''Main plane for computations.'''
-        self.rp = np.asanyarray(ref_plane)
+        self.rp = np.asanyarray(ref_plane, dtype=np.float64)  # Ensure float64
         '''Reference plane for calculating angles. (deprecated)'''
         self.components = components
         '''Tolerance Stack up components.'''
@@ -29,6 +105,8 @@ class Stack:
         self.delta_metrics = []
         self.path=path
         '''Path to save figures.'''
+        self.save=save
+        '''Save figure?'''
 
     def _prepare_numba_data(self):
         """Prepare data structures for Numba functions."""
@@ -74,7 +152,6 @@ class Stack:
 
         '''
         og_metrics = []
-        computed_metrics = []
         start = timeit.default_timer()
         #original main plane
         mp_og = self.mp
@@ -83,56 +160,16 @@ class Stack:
 
         for m in self.metrics:
             og_metrics.append( np.arccos(m["ref"]@norm_mp_og/np.linalg.norm(norm_mp_og)) )
-            computed_metrics.append( np.zeros(ncases) )
 
         (tolerance_types, tolerance_ranges, tolerance_axes, tolerance_counts, 
          component_planes, metric_refs) = self._prepare_numba_data()
+
+        computed_metrics=loop(ncases, mp_og, tolerance_types, tolerance_ranges, tolerance_axes, 
+                              tolerance_counts, component_planes, metric_refs)
         
-        print(metric_refs[0][0])
+        print(computed_metrics)
 
-
-        for i in tqdm(range(ncases)):
-            mp1 = mp_og[0] #main_plane p1
-            mp2 = mp_og[1] #main_plane p2
-            mp3 = mp_og[2] #main_plane p3
-            
-            for j in range(len(self.components)):
-                # Get the original point. The transformation matrix is applied first if it is not the first component
-                if j == 0:
-                    pog = self.components[0]['plane']
-                else:
-                    pog = np.array([(T@np.append(pog[0,:],1))[0:3],
-                                    (T@np.append(pog[1,:],1))[0:3],
-                                    (T@np.append(pog[2,:],1))[0:3]])
-                p1 = pog[0,:]; p2 = pog[1,:]; p3 = pog[2,:]
-                
-                # Apply tolerances
-                for t in self.components[j]['tolerances']: 
-                    if t['type'] == 'cylindrical':
-                        p1 = pm.point_around_axis(p1, t['axis'][0,:], np.random.uniform(t['tol'][0], t['tol'][1]), np.random.uniform(0, 2*np.pi))
-                        p2 = pm.point_around_axis(p2, t['axis'][1,:], np.random.uniform(t['tol'][0], t['tol'][1]), np.random.uniform(0, 2*np.pi))
-                        p3 = pm.point_around_axis(p3, t['axis'][2,:], np.random.uniform(t['tol'][0], t['tol'][1]), np.random.uniform(0, 2*np.pi))
-                    elif t['type'] == 'displacement':
-                        p1 = pm.point_displacement(p1, t['axis'][0,:], np.random.uniform(t['tol'][0], t['tol'][1]))
-                        p2 = pm.point_displacement(p2, t['axis'][1,:], np.random.uniform(t['tol'][0], t['tol'][1]))
-                        p3 = pm.point_displacement(p3, t['axis'][2,:], np.random.uniform(t['tol'][0], t['tol'][1]))
-                    else:
-                        raise Exception('Incompatible tolerance type')
-
-                # Get the transformation matrix (T) related to the applied tolerance
-                p = np.array([p1, p2, p3])
-                T = matrix.get_transformation_matrix(pog, p)
-
-                # Apply it to the mirror
-                mp1 = (T@np.append(mp1,1))[0:3]
-                mp2 = (T@np.append(mp2,1))[0:3]
-                mp3 = (T@np.append(mp3,1))[0:3]
-
-            # Get the angles
-            norm_mp = matrix.get_normal(mp1, mp2, mp3)
-            for k in range(len(self.metrics)):
-                computed_metrics[k][i] = np.arccos(metric_refs[k]@norm_mp)
-
+        
         # Differences with the original points
         for i in range(len(self.metrics)):
             self.delta_metrics.append( np.rad2deg(computed_metrics[i]-og_metrics[i]) )
@@ -140,7 +177,8 @@ class Stack:
         stop = timeit.default_timer()
         print('Time: ', stop-start)
 
-        self.plot_hist()
+        if self.save: 
+            self.plot_hist()
 
     
     def plot_hist(self):
