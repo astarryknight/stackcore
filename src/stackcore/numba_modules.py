@@ -2,6 +2,48 @@ from numba import njit, prange
 import numpy as np
 import numpy.typing as npt
 
+#Numba verbose functions
+@njit
+def dot_product_numba(a, b):
+    """Manual dot product for Numba compatibility."""
+    result = 0.0
+    for i in range(len(a)):
+        result += a[i] * b[i]
+    return result
+
+@njit
+def cross_product_numba(a, b):
+    """Manual cross product for Numba compatibility."""
+    result = np.zeros(3, dtype=np.float64)
+    result[0] = a[1] * b[2] - a[2] * b[1]
+    result[1] = a[2] * b[0] - a[0] * b[2]
+    result[2] = a[0] * b[1] - a[1] * b[0]
+    return result
+
+@njit
+def vector_norm_numba(vector):
+    """Manual vector norm calculation for Numba compatibility."""
+    sum_squares = 0.0
+    for i in range(len(vector)):
+        sum_squares += vector[i] * vector[i]
+    return np.sqrt(sum_squares)
+
+@njit
+def clip(val, min, max):
+    """Manual value clipping in a range for Numba compatibility."""
+    return np.minimum(max, np.maximum(val, min))
+
+@njit
+def matrix_vector_multiply_3x4(matrix, vector):
+    """Multiply 4x4 matrix with 4x1 vector, return first 3 elements."""
+    result = np.zeros(3, dtype=np.float64)
+    for i in range(3):
+        for j in range(4):
+            result[i] += matrix[i, j] * vector[j]
+    return result
+
+
+#Helper functions
 @njit
 def point_around_axis_numba(point, axis, radius, angle):
     """Apply cylindrical tolerance around an axis."""
@@ -22,91 +64,11 @@ def point_around_axis_numba(point, axis, radius, angle):
     displacement = radius * (np.cos(angle) * u + np.sin(angle) * v)
     return point + displacement
 
-# Numba-compiled functions
-
-
-@njit
-def dot_product_numba(a, b):
-    """Manual dot product for Numba compatibility."""
-    result = 0.0
-    for i in range(len(a)):
-        result += a[i] * b[i]
-    return result
-
-@njit
-def cross_product_numba(a, b):
-    """Manual cross product for Numba compatibility."""
-    result = np.zeros(3, dtype=np.float64)
-    result[0] = a[1] * b[2] - a[2] * b[1]
-    result[1] = a[2] * b[0] - a[0] * b[2]
-    result[2] = a[0] * b[1] - a[1] * b[0]
-    return result
-
 @njit
 def point_displacement(point: npt.NDArray, direction: npt.NDArray, distance: float) -> np.ndarray:
-    """A computation that calculates the position of a point along an axis."""
+    """Apply displacement tolerance along an axis."""
     direction = direction/np.linalg.norm(direction)
     return point+distance*direction
-
-@njit
-def matrix_vector_multiply_3x4(matrix, vector):
-    """Multiply 4x4 matrix with 4x1 vector, return first 3 elements."""
-    result = np.zeros(3, dtype=np.float64)
-    for i in range(3):
-        for j in range(4):
-            result[i] += matrix[i, j] * vector[j]
-    return result
-
-
-
-#USEFUL HELPER FUNCS
-
-@njit
-def clip(val, min, max):
-    return np.minimum(max, np.maximum(val, min))
-
-# @njit
-# def norm(a):
-#     norms = np.empty(a.shape[1], dtype=a.dtype)
-#     for i in prange(a.shape[1]):
-#         norms[i] = np.sqrt(a[0, i] * a[0, i] + a[1, i] * a[1, i])
-#     return norms
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-import numpy as np
-import numpy.typing as npt
-
-# @njit
-# def get_normal(p1: npt.NDArray, p2: npt.NDArray, p3: npt.NDArray) -> np.ndarray:
-#     """
-#     A computation that returns the vector norm of a plane defined by 3 points.
-
-#     """
-#     v1 = p2-p1
-#     v2 = p3-p1
-#     n = np.cross(v1, v2)
-#     return n/norm(n)#np.linalg.norm(n)
-
-@njit
-def vector_norm_numba(vector):
-    """Manual vector norm calculation."""
-    sum_squares = 0.0
-    for i in range(len(vector)):
-        sum_squares += vector[i] * vector[i]
-    return np.sqrt(sum_squares)
 
 @njit
 def get_normal_numba(p1, p2, p3):
@@ -126,10 +88,7 @@ def get_normal_numba(p1, p2, p3):
 
 @njit
 def get_rotation_matrix(a: npt.NDArray, b: npt.NDArray) -> np.ndarray:
-    """
-    A computation that returns the rotation matrix between two matrices.
-
-    """
+    """Calculate the rotation matrix between two vectors."""
     a = a/np.linalg.norm(a)
     b = b/np.linalg.norm(b)
 
@@ -154,10 +113,7 @@ def get_rotation_matrix(a: npt.NDArray, b: npt.NDArray) -> np.ndarray:
 
 @njit
 def get_transformation_matrix(plane1_points: npt.NDArray, plane2_points: npt.NDArray) -> np.ndarray:
-    """
-    A computation that returns the transformation matrix between two matrices.
-
-    """
+    """Calculate the transformation matrix between two matrices."""
     n1 = get_normal_numba(plane1_points[0], plane1_points[1], plane1_points[2])
     n2 = get_normal_numba(plane2_points[0], plane2_points[1], plane2_points[2])
     R = get_rotation_matrix(n1, n2)

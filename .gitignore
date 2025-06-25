@@ -1,5 +1,6 @@
 pyproject.toml.bu
 archive
+numba_test
 *.ipynb
 __pycache__
 .pytest_cache
@@ -7,4 +8,3 @@ __pycache__
 model_datagen.py
 /src/stackcore/stack_n2.py
 /src/stackcore/stack_numba.py
-/numba/*.png
