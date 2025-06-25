@@ -1,4 +1,4 @@
-from stackcore import Stack
+from stackcore import Stack, PStack
 import numpy as np
 
 m=np.array([[3,  2, -1],
@@ -34,6 +34,12 @@ components = [
 
 path = "./"
 
-s = Stack(m, r, components, metrics, path)
 ncases = int(1e3)
+
+#Stack with regular processing
+s = Stack(m, r, components, metrics, path)
+s.monte(ncases)
+
+#Stack with parallel processing
+ps = PStack(m, r, components, metrics, path)
 s.monte(ncases)

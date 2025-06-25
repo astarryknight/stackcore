@@ -1,5 +1,5 @@
 <h1 align="center">
-<img src="./res/logo.png" width="400">
+<img src="./res/logo2.png" width="400">
 </h1><br>
 
 [![Python
@@ -18,7 +18,7 @@ StackCore is a lightweight Python package for mechanical **tolerance stack‑up 
 - 🔁 **Monte Carlo engine**: generate distributions, confidence ranges, and worst‑case scenarios.
 - 🧠 **Subtle intelligence** (coming soon!): leverage surrogate modelling for quick inference responses at comparable convergence.
 - 📊 **Flexible output**: summary stats, histograms, and data visualization tools.
-- 🔌 **Clean APIs**: `Stack`
+- 🔌 **Clean APIs**: `Stack`, `PStack`
 - 🛠️ **Designed for engineers**: zone‑independent, boundary‑aware, CAD/tool‑agnostic.
 
 ---
@@ -84,5 +84,12 @@ The path variable defines where any generated figures should be stored. Here's a
 path = 'path/to/figures/'
 ```
 <br>
+
+## Parallel Processing
+For faster processing, the ```PStack``` object is provided that uses the ```numba``` package to parallelize the loops in the monte carlo simulation. To use the ```PStack```, import it using
+```python
+from stackcore import PStack
+```
+All of the same functions of the ```Stack``` object are available in the ```PStack``` Object.
 
 For a full example, see [example.py](example.py)
