@@ -3,6 +3,8 @@
 #process arguments
 OPTSTRING="v:rc:"
 RELEASE=false
+COMMIT=false
+CMT_MESSAGE=""
 
 while getopts ${OPTSTRING} opt; do
   case ${opt} in
@@ -13,10 +15,8 @@ while getopts ${OPTSTRING} opt; do
       RELEASE=true
       ;;
     c)
-      git add -A
-      echo $OPTARG
-      git commit -m "${OPTARG}"
-      git push
+      COMMIT=true
+      CMT_MESSAGE=${OPTARG}
       ;;
     ?)
       echo "Invalid option: -${OPTARG}."
@@ -55,4 +55,11 @@ python3 -m twine upload --repository testpypi dist/* --verbose
 #create github release
 if [ "$RELEASE" = true ]; then
     gh release create v$VERSION ./dist/*.gz --latest -n "# stackcore $VERSION Release Notes:" -t "v$VERSION ($(date '+%m/%d/%Y'))"
+fi
+
+if [ "$COMMIT" = true ]; then
+  git add -A
+  echo $OPTARG
+  git commit -m "v${VERSION}: ${CMT_MESSAGE}"
+  git push
 fi
