@@ -35,7 +35,7 @@ To import the ```stackcore``` module, use
 import stackcore
 ```
 
-The main component, the ```Stack``` can be imported as follows
+The main component, the ```Stack``` can be imported as follows:
 ```python
 from stackcore import Stack
 ```
@@ -86,10 +86,10 @@ path = 'path/to/figures/'
 <br>
 
 ## Parallel Processing
-For faster processing, the ```PStack``` object is provided that uses the ```numba``` package to parallelize the loops in the monte carlo simulation. To use the ```PStack```, import it using
+For faster processing, the ```PStack``` object is provided that uses the ```numba``` package to parallelize the loops in the monte carlo simulation. To use the ```PStack```, import it using:
 ```python
 from stackcore import PStack
 ```
-All of the same functions of the ```Stack``` object are available in the ```PStack``` Object.
+All of the same functions of the ```Stack``` object are available in the ```PStack``` object.
 
 For a full example, see [example.py](example.py)
