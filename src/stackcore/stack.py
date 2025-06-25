@@ -13,7 +13,7 @@ from . import numba_modules as nbm
 
 class Stack:
     """Stack for tolerance analysis stack-up analysis tools."""
-    def __init__(self, main_plane: npt.NDArray, ref_plane: npt.NDArray, components: dict, metrics: dict, path: str):
+    def __init__(self, main_plane: npt.NDArray, ref_plane: npt.NDArray, components: dict, metrics: dict, path: str, save: bool):
         self.mp = np.asanyarray(main_plane)
         '''Main plane for computations.'''
         self.rp = np.asanyarray(ref_plane)
@@ -23,8 +23,10 @@ class Stack:
         self.metrics = metrics
         '''Metrics to be calculated.'''
         self.delta_metrics = []
-        self.path=path
+        self.path = path
         '''Path to save figures.'''
+        self.save = save
+        '''Save figure?'''
 
     def monte(self, ncases: int):        #TODO more robust error handling
         """Compute Monte Carlo simulation for mechanical tolerances."""
@@ -184,9 +186,9 @@ class PStack:
         self.metrics = metrics
         '''Metrics to be calculated.'''
         self.delta_metrics = []
-        self.path=path
+        self.path = path
         '''Path to save figures.'''
-        self.save=save
+        self.save = save
         '''Save figure?'''
 
     def _prepare_numba_data(self):

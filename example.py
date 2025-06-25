@@ -1,4 +1,5 @@
-from stackcore import Stack, PStack
+from stackcore.stack import Stack, PStack
+import argparse
 import numpy as np
 
 m=np.array([[3,  2, -1],
@@ -34,12 +35,21 @@ components = [
 
 path = "./"
 
+parser = argparse.ArgumentParser(description="A script that runs a stackcore montecarlo simulation example.")
+
+parser.add_argument("-n", "--ncases", help="Set the number of cases to run the monte carlo simulation for.")
+parser.add_argument("-s", "--save_fig", action="store_true", help="Save the histogram to the specified path.")
+args = parser.parse_args()
+
 ncases = int(1e3)
 
+if args.ncases:
+    ncases=int(float(args.ncases))
+
 #Stack with regular processing
-s = Stack(m, r, components, metrics, path)
+s = Stack(m, r, components, metrics, path, args.save_fig)
 s.monte(ncases)
 
 #Stack with parallel processing
-ps = PStack(m, r, components, metrics, path)
+ps = PStack(m, r, components, metrics, path, args.save_fig)
 ps.monte(ncases)
