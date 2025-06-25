@@ -11,8 +11,27 @@ from . import point_manipulation as pm
 
 from . import numba_modules as nbm
 
+
 class Stack:
-    """Stack for tolerance analysis stack-up analysis tools."""
+    """Smart Stack for stack-up tolerance analysis."""
+    def __init__(self, main_plane: npt.NDArray, ref_plane: npt.NDArray, components: dict, metrics: dict, path: str, save: bool):
+        self.mp = np.asanyarray(main_plane)
+        '''Main plane for computations.'''
+        self.rp = np.asanyarray(ref_plane)
+        '''Reference plane for calculating angles. (deprecated)'''
+        self.components = components
+        '''Tolerance Stack up components.'''
+        self.metrics = metrics
+        '''Metrics to be calculated.'''
+        self.delta_metrics = []
+        self.path = path
+        '''Path to save figures.'''
+        self.save = save
+        '''Save figure?'''
+
+
+class SStack:
+    """Sequential Stack for stack-up tolerance analysis."""
     def __init__(self, main_plane: npt.NDArray, ref_plane: npt.NDArray, components: dict, metrics: dict, path: str, save: bool):
         self.mp = np.asanyarray(main_plane)
         '''Main plane for computations.'''
@@ -89,11 +108,13 @@ class Stack:
             self.delta_metrics.append( np.rad2deg(computed_metrics[i]-og_metrics[i]) )
 
         stop = timeit.default_timer()
+
+        if self.save:
+            self.plot_hist()
+
         print('Time: ', stop-start)
+        return stop-start
 
-        self.plot_hist()
-
-    
     def plot_hist(self):
         """Plot Monte Carlo simulation deltas with Gaussian (Normal) distribution."""
         for i in range(len(self.metrics)):
@@ -175,7 +196,7 @@ def loop(ncases, mp_og, tolerance_types, tolerance_ranges, tolerance_axes, toler
 
 
 class PStack:
-    """Parallel stack for tolerance analysis."""
+    """Parallel stack for stack-up tolerance analysis."""
     def __init__(self, main_plane: npt.NDArray, ref_plane: npt.NDArray, components: dict, metrics: dict, path: str, save: bool):
         self.mp = np.asanyarray(main_plane, dtype=np.float64)  # Ensure float64
         '''Main plane for computations.'''
@@ -252,11 +273,12 @@ class PStack:
             self.delta_metrics.append( np.rad2deg(computed_metrics[i]-og_metrics[i]) )
 
         stop = timeit.default_timer()
-        print('Time: ', stop-start)
 
         if self.save: 
             self.plot_hist()
 
+        print('Time: ', stop-start)
+        return stop-start
     
     def plot_hist(self):
         """Plot Monte Carlo simulation deltas with normalized curve."""
