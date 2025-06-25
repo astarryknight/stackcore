@@ -42,4 +42,4 @@ s.monte(ncases)
 
 #Stack with parallel processing
 ps = PStack(m, r, components, metrics, path)
-s.monte(ncases)
+ps.monte(ncases)
