@@ -8,3 +8,4 @@ __pycache__
 model_datagen.py
 /src/stackcore/stack_n2.py
 /src/stackcore/stack_numba.py
+/stackfuse/

@@ -12,25 +12,25 @@ from . import point_manipulation as pm
 from . import numba_modules as nbm
 
 
-class Stack:
-    """Smart Stack for stack-up tolerance analysis."""
-    def __init__(self, main_plane: npt.NDArray, ref_plane: npt.NDArray, components: dict, metrics: dict, path: str, save: bool):
-        self.mp = np.asanyarray(main_plane)
-        '''Main plane for computations.'''
-        self.rp = np.asanyarray(ref_plane)
-        '''Reference plane for calculating angles. (deprecated)'''
-        self.components = components
-        '''Tolerance Stack up components.'''
-        self.metrics = metrics
-        '''Metrics to be calculated.'''
-        self.delta_metrics = []
-        self.path = path
-        '''Path to save figures.'''
-        self.save = save
-        '''Save figure?'''
+# class Stack:
+#     """Smart Stack for stack-up tolerance analysis."""
+#     def __init__(self, main_plane: npt.NDArray, ref_plane: npt.NDArray, components: dict, metrics: dict, path: str, save: bool):
+#         self.mp = np.asanyarray(main_plane)
+#         '''Main plane for computations.'''
+#         self.rp = np.asanyarray(ref_plane)
+#         '''Reference plane for calculating angles. (deprecated)'''
+#         self.components = components
+#         '''Tolerance Stack up components.'''
+#         self.metrics = metrics
+#         '''Metrics to be calculated.'''
+#         self.delta_metrics = []
+#         self.path = path
+#         '''Path to save figures.'''
+#         self.save = save
+#         '''Save figure?'''
 
 
-class SStack:
+class Stack:#SStack:
     """Sequential Stack for stack-up tolerance analysis."""
     def __init__(self, main_plane: npt.NDArray, ref_plane: npt.NDArray, components: dict, metrics: dict, path: str, save: bool):
         self.mp = np.asanyarray(main_plane)

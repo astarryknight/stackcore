@@ -29,7 +29,7 @@ StackCore is a lightweight Python package for mechanical **tolerance stack‑up 
 pip install stackcore
 ```
 
-## Sample Use
+## Usage
 To import the ```stackcore``` module, use
 ```python
 import stackcore
@@ -83,9 +83,8 @@ The path variable defines where any generated figures should be stored. Here's a
 ```python
 path = 'path/to/figures/'
 ```
-<br>
 
-## Parallel Processing
+### Parallel Processing
 For faster processing, the ```PStack``` object is provided that uses the ```numba``` package to parallelize the loops in the monte carlo simulation. To use the ```PStack```, import it using:
 ```python
 from stackcore import PStack
@@ -93,3 +92,8 @@ from stackcore import PStack
 All of the same functions of the ```Stack``` object are available in the ```PStack``` object.
 
 For a full example, see [example.py](example.py)
+
+<br>
+
+## Stackfuse
+To use a GUI interface, see [StackFuse](https://github.com/astarryknight/stackfuse/tree/main?tab=readme-ov-file): A Fusion360 add-in that connects with ```stackcore``` to create an intuitive way to tolerance and analyze mechanical assemblies.
