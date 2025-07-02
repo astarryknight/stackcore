@@ -6,10 +6,13 @@ from numba import njit, prange
 from tqdm import tqdm
 import timeit
 
-from . import matrix
-from . import point_manipulation as pm
+# from . import matrix
+# from . import point_manipulation as pm
 
-from . import numba_modules as nbm
+# from . import numba_modules as nbm
+import matrix
+import point_manipulation as pm
+import numba_modules as nbm
 
 
 # class Stack:
@@ -36,7 +39,7 @@ class Stack:#SStack:
         self.mp = np.asanyarray(main_plane)
         '''Main plane for computations.'''
         self.rp = np.asanyarray(ref_plane)
-        '''Reference plane for calculating angles. (deprecated)'''
+        '''Reference plane for computing metrics.'''
         self.components = components
         '''Tolerance Stack up components.'''
         self.metrics = metrics
@@ -57,8 +60,11 @@ class Stack:#SStack:
 
         norm_mp_og = matrix.get_normal(mp_og[0], mp_og[1], mp_og[2])
 
+        r=self.rp
+        ref_norm = matrix.get_normal(r[0], r[1], r[2])
+
         for m in self.metrics:
-            og_metrics.append( np.arccos(m["ref"]@norm_mp_og/np.linalg.norm(norm_mp_og)) )
+            og_metrics.append( np.arccos(ref_norm@norm_mp_og/np.linalg.norm(norm_mp_og)) )
             computed_metrics.append( np.zeros(ncases) )
 
         for i in tqdm(range(ncases)):
@@ -101,7 +107,7 @@ class Stack:#SStack:
             # Get the angles
             norm_mp = matrix.get_normal(mp1, mp2, mp3)
             for k in range(len(self.metrics)):
-                computed_metrics[k][i] = np.arccos(self.metrics[k]["ref"]@norm_mp)
+                computed_metrics[k][i] = np.arccos(ref_norm@norm_mp)
 
         # Differences with the original points
         for i in range(len(self.metrics)):
@@ -201,7 +207,7 @@ class PStack:
         self.mp = np.asanyarray(main_plane, dtype=np.float64)  # Ensure float64
         '''Main plane for computations.'''
         self.rp = np.asanyarray(ref_plane, dtype=np.float64)  # Ensure float64
-        '''Reference plane for calculating angles. (deprecated)'''
+        '''Reference plane for computing metrics.'''
         self.components = components
         '''Tolerance Stack up components.'''
         self.metrics = metrics
@@ -242,9 +248,12 @@ class PStack:
                 tolerance_axes[i, j] = np.asarray(tol['axis'], dtype=np.float64)
         
         # Prepare metrics data
-        metric_refs = np.zeros((len(self.metrics), 3), dtype=np.float64)
-        for i, metric in enumerate(self.metrics):
-            metric_refs[i] = np.asarray(metric['ref'], dtype=np.float64)
+        # metric_refs = np.zeros((len(self.metrics), 3), dtype=np.float64)
+        # for i, metric in enumerate(self.metrics):
+        #     metric_refs[i] = np.asarray(metric['ref'], dtype=np.float64)
+        r=self.rp
+        ref_norm = matrix.get_normal(r[0], r[1], r[2])
+        metric_refs = np.array([ref_norm])
         
         return (tolerance_types, tolerance_ranges, tolerance_axes, tolerance_counts, 
                 component_planes, metric_refs)
@@ -259,8 +268,11 @@ class PStack:
 
         norm_mp_og = matrix.get_normal(mp_og[0], mp_og[1], mp_og[2])
 
+        r=self.rp
+        ref_norm = matrix.get_normal(r[0], r[1], r[2])
+
         for m in self.metrics:
-            og_metrics.append( np.arccos(m["ref"]@norm_mp_og/np.linalg.norm(norm_mp_og)) )
+            og_metrics.append( np.arccos(ref_norm@norm_mp_og/np.linalg.norm(norm_mp_og)) )
 
         (tolerance_types, tolerance_ranges, tolerance_axes, tolerance_counts, 
          component_planes, metric_refs) = self._prepare_numba_data()
