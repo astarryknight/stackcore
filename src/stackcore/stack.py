@@ -6,10 +6,13 @@ from numba import njit, prange
 from tqdm import tqdm
 import timeit
 
-from . import matrix
-from . import point_manipulation as pm
+# from . import matrix
+# from . import point_manipulation as pm
+# from . import numba_modules as nbm
 
-from . import numba_modules as nbm
+import matrix
+import point_manipulation as pm
+import numba_modules as nbm
 
 
 # class Stack:
@@ -134,7 +137,7 @@ class Stack:#SStack:
             ax.axvline(x = mu-3*std, linestyle = '--', color = 'grey')
             ax.axvline(x = mu+3*std, linestyle = '--', color = 'grey')
             plt.plot(x, p/p.max()*y.max(), 'k', linewidth=3, label='Fitted normal distribution')
-            ax.text(0.95, 0.95, 'std = '+str((mu+std).round(3))+'\n 3std = '+str((3*(mu+std)).round(3)), transform=ax.transAxes,
+            ax.text(0.95, 0.95, 'std = '+str((mu+std).round(3))+'\n 3std = '+str((3*(mu+std)).round(3))+'\nWorst: ('+str(np.round(np.min(d),2))+','+str(np.round(np.max(d),2))+')', transform=ax.transAxes,
                     fontsize=12, ha='right', va='top', 
                     bbox=dict(facecolor='white', edgecolor='black', boxstyle='round,pad=0.5'))
             ax.set_xlabel(f"delta {self.metrics[i]['name']} [deg]") #may change if not angle...
@@ -291,6 +294,7 @@ class PStack:
     
     def plot_hist(self):
         """Plot Monte Carlo simulation deltas with normalized curve."""
+        # plt.rcParams.update({'font.size':18})
         for i in range(len(self.metrics)):
             d=self.delta_metrics[i]
             # Get the Gaussian fit 
@@ -305,7 +309,7 @@ class PStack:
             ax.axvline(x = mu-3*std, linestyle = '--', color = 'grey')
             ax.axvline(x = mu+3*std, linestyle = '--', color = 'grey')
             plt.plot(x, p/p.max()*y.max(), 'k', linewidth=3, label='Fitted normal distribution')
-            ax.text(0.95, 0.95, 'std = '+str((mu+std).round(3))+'\n 3std = '+str((3*(mu+std)).round(3)), transform=ax.transAxes,
+            ax.text(0.95, 0.95, 'std = '+str((mu+std).round(3))+'\n 3std = '+str((3*(mu+std)).round(3))+'\nWorst: ('+str(np.round(np.min(d),2))+','+str(np.round(np.max(d),2))+')', transform=ax.transAxes,
                     fontsize=12, ha='right', va='top', 
                     bbox=dict(facecolor='white', edgecolor='black', boxstyle='round,pad=0.5'))
             ax.set_xlabel(f"delta {self.metrics[i]['name']} [deg]") #may change if not angle...
