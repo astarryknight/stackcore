@@ -6,13 +6,9 @@ from numba import njit, prange
 from tqdm import tqdm
 import timeit
 
-# from . import matrix
-# from . import point_manipulation as pm
-# from . import numba_modules as nbm
-
-import matrix
-import point_manipulation as pm
-import numba_modules as nbm
+from . import matrix
+from . import point_manipulation as pm
+from . import numba_modules as nbm
 
 
 # class Stack:
