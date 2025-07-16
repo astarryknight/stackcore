@@ -11,24 +11,6 @@ from . import point_manipulation as pm
 from . import numba_modules as nbm
 
 
-# class Stack:
-#     """Smart Stack for stack-up tolerance analysis."""
-#     def __init__(self, main_plane: npt.NDArray, ref_plane: npt.NDArray, components: dict, metrics: dict, path: str, save: bool):
-#         self.mp = np.asanyarray(main_plane)
-#         '''Main plane for computations.'''
-#         self.rp = np.asanyarray(ref_plane)
-#         '''Reference plane for calculating angles. (deprecated)'''
-#         self.components = components
-#         '''Tolerance Stack up components.'''
-#         self.metrics = metrics
-#         '''Metrics to be calculated.'''
-#         self.delta_metrics = []
-#         self.path = path
-#         '''Path to save figures.'''
-#         self.save = save
-#         '''Save figure?'''
-
-
 class Stack:#SStack:
     """Sequential Stack for stack-up tolerance analysis."""
     def __init__(self, main_plane: npt.NDArray, ref_plane: npt.NDArray, components: dict, metrics: dict, path: str, save: bool):
@@ -312,3 +294,81 @@ class PStack:
             ax.set_ylabel('# cases')
             plt.tight_layout()
             plt.savefig(f"{self.path}/delta_{self.metrics[i]['name']}_dist.png")
+
+
+
+## METROLOGY IMPLEMENTATION ##
+
+class MStack:
+    """Stack for using metrology data to compare CAD assemblies with as-built components."""
+    def __init__(self, main_plane: npt.NDArray, ref_plane: npt.NDArray, components: dict, metrics: dict, path: str, save: bool):
+        self.mp = np.asanyarray(main_plane, dtype=np.float64)  # Ensure float64
+        '''Main plane for computations.'''
+        self.rp = np.asanyarray(ref_plane, dtype=np.float64)  # Ensure float64
+        '''Reference plane for computing metrics.'''
+        self.components = components
+        '''Tolerance Stack up components.'''
+        self.metrics = metrics
+        '''Metrics to be calculated.'''
+        self.delta_metric = 0.0
+        self.path = path
+        '''Path to save figures.'''
+        self.save = save
+        '''Save figure?'''
+
+    def stack(self):
+        """Stacks up all metrology tolerances to observe the effect of the as-built components."""
+
+        #original main plane
+        mp_og = self.mp
+
+        norm_mp_og = matrix.get_normal(mp_og[0], mp_og[1], mp_og[2])
+
+        r=self.rp
+        ref_norm = matrix.get_normal(r[0], r[1], r[2])
+
+        og_metric = np.arccos(ref_norm@norm_mp_og/np.linalg.norm(norm_mp_og))
+
+        mp1 = mp_og[0] #main_plane p1
+        mp2 = mp_og[1] #main_plane p2
+        mp3 = mp_og[2] #main_plane p3
+        
+        for j in range(len(self.components)):
+            # Get the original point. The transformation matrix is applied first if it is not the first component
+            if j == 0:
+                pog = np.asarray([
+                    self.components[0]['points'][0]['coordinates'],
+                    self.components[0]['points'][1]['coordinates'],
+                    self.components[0]['points'][2]['coordinates']
+                ])
+            else:
+                pog = np.array([(T@np.append(pog[0,:],1))[0:3],
+                                (T@np.append(pog[1,:],1))[0:3],
+                                (T@np.append(pog[2,:],1))[0:3]])
+            p1 = pog[0,:].copy(); p2 = pog[1,:].copy(); p3 = pog[2,:].copy()
+            
+            p = self.components[j]['points']
+
+            # Applying tolerances
+            p1 += [p[0]['dx'], p[0]['dy'], p[0]['dz']]
+            p2 += [p[1]['dx'], p[1]['dy'], p[1]['dz']]
+            p3 += [p[2]['dx'], p[2]['dy'], p[2]['dz']]
+            #does this work for a whole stack?????
+
+            # Get the transformation matrix (T) related to the applied tolerance
+            p = np.array([p1, p2, p3])
+            T = matrix.get_transformation_matrix(pog, p)
+
+            # Apply it to the mirror
+            mp1 = (T@np.append(mp1,1))[0:3]
+            mp2 = (T@np.append(mp2,1))[0:3]
+            mp3 = (T@np.append(mp3,1))[0:3]
+
+        # Get the angles
+        norm_mp = matrix.get_normal(mp1, mp2, mp3)
+        computed_metric = np.arccos(ref_norm@norm_mp)
+
+        # Differences with the original points
+        self.delta_metric = ( np.rad2deg(computed_metric-og_metric) )
+
+        return self.delta_metric

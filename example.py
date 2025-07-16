@@ -1,4 +1,4 @@
-from stackcore.stack import Stack, PStack
+from stackcore.stack import Stack, PStack, MStack
 import argparse
 import numpy as np
 
@@ -31,6 +31,44 @@ components = [
                                                  [-.7, -0.9, 0.]])}]}
 ]
 
+metrology_components = [
+  {
+      "name": "Component",
+      "points": [
+          {
+              "coordinates": [
+                  -893.2392974216641,
+                  87.71191732970048,
+                  89.56830000000001
+              ],
+              "dx": 1.0,
+              "dy": 0.20000000000000004,
+              "dz": -340.0
+          },
+          {
+              "coordinates": [
+                  -873.9117340776694,
+                  102.07391214880107,
+                  133.3033
+              ],
+              "dx": 1.0,
+              "dy": -200.0,
+              "dz": 10.0
+          },
+          {
+              "coordinates": [
+                  -873.9117340776694,
+                  102.07391214880107,
+                  21.5033
+              ],
+              "dx": -100.0,
+              "dy": -0.10000000000000002,
+              "dz": -0.01
+          }
+      ]
+  }
+]
+
 path = "./"
 
 parser = argparse.ArgumentParser(description="A script that runs a stackcore montecarlo simulation example.")
@@ -51,3 +89,6 @@ s.monte(ncases)
 #Stack with parallel processing
 ps = PStack(m, r, components, metrics, path, args.save_fig)
 ps.monte(ncases)
+
+m = MStack(m, r, metrology_components, metrics, path, args.save_fig)
+print(m.stack())
