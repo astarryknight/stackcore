@@ -49,7 +49,8 @@ python3 -m build
 
 #uploading to pypi
 python3 -m pip install --upgrade twine
-python3 -m twine upload --repository testpypi dist/* --verbose
+#python3 -m twine upload --repository testpypi dist/* --verbose USE THIS FOR TEST SERVER
+python3 -m twine upload dist/* --verbose
 
 
 #create github release

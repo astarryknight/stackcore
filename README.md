@@ -16,9 +16,8 @@ StackCore is a lightweight Python package for mechanical **tolerance stack‑up 
 
 - 🧮 **Tolerance stack‑up under control**: manage multi‑component linear and geometric assemblies.
 - 🔁 **Monte Carlo engine**: generate distributions, confidence ranges, and worst‑case scenarios.
-- 🧠 **Subtle intelligence** (coming soon!): leverage surrogate modelling for quick inference responses at comparable convergence.
 - 📊 **Flexible output**: summary stats, histograms, and data visualization tools.
-- 🔌 **Clean APIs**: `Stack`, `PStack`
+- 🔌 **Clean APIs**: `Stack`, `PStack`, `MStack`
 - 🛠️ **Designed for engineers**: zone‑independent, boundary‑aware, CAD/tool‑agnostic.
 
 ---
@@ -69,12 +68,11 @@ components = [
 ]
 ```
 ### Metrics
-The metrics variable contains a dictionary of the targeted metrics and their reference type. Here's an example:
+The metrics variable contains a dictionary of the targeted metrics and their reference type. The 2 tolerance types currently supported are ```'Angular'``` and ```'Linear'``` Here's an example:
 ```python
 metrics = [
     { 'name': 'alpha',
-      'type': 'angle', 
-      'ref': np.array([0,0,1])
+      'type': 'Angular'
     }
 ]
 ```
@@ -91,9 +89,61 @@ from stackcore import PStack
 ```
 All of the same functions of the ```Stack``` object are available in the ```PStack``` object.
 
-For a full example, see [example.py](example.py)
+
+## Metrology
+(v0.3.0) StackCore now supports component compatibility testing via metrology data. 
+To access this, use the ```MStack``` object, which takes the same inputs as the serial and parallel stacks above. To use the ```MStack``` object:
+
+```python
+from stackcore import Mstack
+```
+
+For metrology, the ```component``` input looks a little different. Each component is defined by **3 points**, and each point has its own metrology (∂x, ∂y, ∂z) associated with it. Here's an example:
+
+```python
+[
+        {
+            "name": "Component",
+            "points": [
+                {
+                    "coordinates": [
+                        -20,
+                        10,
+                        6
+                    ],
+                    "dx": 1.0,
+                    "dy": -1.0,
+                    "dz": 0.0
+                },
+                {
+                    "coordinates": [
+                        -15,
+                        12,
+                        5
+                    ],
+                    "dx": 0.0,
+                    "dy": 0.2,
+                    "dz": 0.3
+                },
+                {
+                    "coordinates": [
+                        -3,
+                        5,
+                        6
+                    ],
+                    "dx": -1.0,
+                    "dy": 0.01,
+                    "dz": -0.4
+                }
+            ]
+        }
+    ]
+```
 
 <br>
+
+
+For a full example, see [example.py](example.py)
 
 ## Stackfuse
 To use a GUI interface, see [StackFuse](https://github.com/astarryknight/stackfuse/tree/main?tab=readme-ov-file): A Fusion360 add-in that connects with ```stackcore``` to create an intuitive way to tolerance and analyze mechanical assemblies.
