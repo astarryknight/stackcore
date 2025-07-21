@@ -4,9 +4,9 @@ build-backend = "hatchling.build"
 
 [project]
 name = "stackcore"
-version = "0.3.2"
+version = "0.3.3"
 authors = [
-  { name="Example Author", email="author@example.com" },
+  { name="John Girgis", email="author@example.com" },
 ]
 description = "A lightweight Python package for mechanical tolerance stack‑up analysis."
 dependencies = [

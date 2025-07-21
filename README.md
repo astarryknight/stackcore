@@ -1,9 +1,13 @@
 <h1 align="center">
-<img src="./res/logo2.png" width="400">
+<img src="https://raw.githubusercontent.com/astarryknight/stackcore/6d82c44462fd27b4d81cc284fd7121e8935151ec/res/logo2.png" width="400">
+
 </h1><br>
 
 [![Python
 3.6+](https://img.shields.io/badge/python-3.9-blue.svg)](https://www.python.org/downloads/release/python-360/)
+![PyPI - Version](https://img.shields.io/pypi/v/stackcore)
+
+
 
 
 **Precision at the core: total tolerance stack‑up, intelligently fused.**
