@@ -52,3 +52,22 @@ def get_transformation_matrix(plane1_points: npt.NDArray, plane2_points: npt.NDA
     T[:3, :3] = R
     T[:3, 3] = t
     return T
+
+def point_to_plane_distance(point, plane_point, plane_normal):
+    return np.dot(point - plane_point, plane_normal) / np.linalg.norm(plane_normal)
+
+def distance_between_planes_general(plane1_pts, plane2_pts):
+    """
+    Computes average distance between a triangle plane and a reference plane
+    using the three corners of the triangle.
+
+    plane1_pts: 3x3 array-like — points on first plane
+    plane2_pts: 3x3 array-like — points on second plane
+    """
+    # Compute normal of plane2 (reference)
+    normal = get_normal(plane2_pts[0], plane2_pts[1], plane2_pts[2])
+    ref_point = plane2_pts[0]
+
+    # Compute distance from each point of plane1 to plane2
+    distances = [point_to_plane_distance(p, ref_point, normal) for p in plane1_pts]
+    return np.mean(distances)  # or np.max(distances) - np.min(distances), if you want range

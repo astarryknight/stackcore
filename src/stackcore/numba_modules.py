@@ -113,7 +113,12 @@ def get_rotation_matrix(a: npt.NDArray, b: npt.NDArray) -> np.ndarray:
 
 @njit
 def get_transformation_matrix(plane1_points: npt.NDArray, plane2_points: npt.NDArray) -> np.ndarray:
-    """Calculate the transformation matrix between two matrices."""
+    """
+    Calculate the transformation matrix between two matrices.
+    
+    plane1_pts: 3x3 array-like — points on first plane
+    plane2_pts: 3x3 array-like — points on second plane
+    """
     n1 = get_normal_numba(plane1_points[0], plane1_points[1], plane1_points[2])
     n2 = get_normal_numba(plane2_points[0], plane2_points[1], plane2_points[2])
     R = get_rotation_matrix(n1, n2)
@@ -123,3 +128,27 @@ def get_transformation_matrix(plane1_points: npt.NDArray, plane2_points: npt.NDA
     T[:3, :3] = R
     T[:3, 3] = t
     return T
+
+@njit
+def point_to_plane_distance(point, plane_point, plane_normal):
+    return np.dot(point - plane_point, plane_normal) / np.linalg.norm(plane_normal)
+
+@njit
+def distance_between_planes_numba(plane1_pts, plane2_pts):
+    """
+    Computes average distance between a triangle plane and a reference plane
+    using the three corners of the triangle.
+
+    plane1_pts: 3x3 array-like — points on first plane
+    plane2_pts: 3x3 array-like — points on second plane
+    """
+    # Compute normal of plane2 (reference)
+    normal = get_normal_numba(plane2_pts[0], plane2_pts[1], plane2_pts[2])
+    ref_point = plane2_pts[0]
+
+    # Compute distance from each point of plane1 to plane2
+    distances = np.asarray([point_to_plane_distance(p, ref_point, normal) for p in plane1_pts])
+    return np.mean(distances)  # or np.max(distances) - np.min(distances), if you want range
+
+
+#CHECK X AND Y AND Z AXES FOR SIMILAR VALUES - then we know which (if any) is the parallel direction
